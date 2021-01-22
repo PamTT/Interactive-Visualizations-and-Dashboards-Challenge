@@ -19,10 +19,11 @@ function buildMetaData(idd) {
     PANEL.html("");
 
     Object.entries(inputID).forEach(([key,value]) => {
-      PANEL.append("h5").text(`${key}: ${value}`);
+      PANEL.append("h6").text(`${key}: ${value}`);
     
   });
   // call build gauge
+  
 });
 }
 
@@ -37,15 +38,11 @@ function buildPlots(x) {
     var samplesArray = samples.filter(q=> q.id == x)
     var result = samplesArray[0];
 
-
-
     //var xData = result.otu_ids.slice(0,10);
     //var yData = result.sample_values.slice(0,10);
 
-    //var markerSize = result.sample_values;
     var sample_values = result.sample_values;
 
-    //var markerColor = result.otu_ids;
     var otu_ids = result.otu_ids;
 
     var textValues = result.otu_labels;
@@ -68,7 +65,7 @@ function buildPlots(x) {
     };
 
     Plotly.newPlot("bar", barData, barlayout);
-
+    
     //bubble chart
     trace2 = {
       x: otu_ids,
@@ -77,13 +74,16 @@ function buildPlots(x) {
       mode: "markers",
       marker: {
         color: otu_ids,
-        size: sample_values}
+        size: sample_values,
+        sizeref: 0.05,
+        sizemode: 'area'}
     };
 
     var bubbleData = [trace2];
 
     var bubblelayout = {
-      xaxis: {title: "OTU ID"}
+      xaxis: {title: "OTU ID"},
+      yaxis: {title: "OTU Values"}
     };
 
     Plotly.newPlot("bubble", bubbleData, bubblelayout);
@@ -111,7 +111,6 @@ function init() {
 
 };
 
-
 //creat function for getting data once a new sample id is selected
 function optionChanged(newID) {
   console.log("This is a function for Selecting New Sample");
@@ -119,7 +118,6 @@ function optionChanged(newID) {
   buildMetaData(newID);
   buildPlots(newID);
 }
-
 
 ///Initializes the page with a default panel
 //buildMetaData("941");
