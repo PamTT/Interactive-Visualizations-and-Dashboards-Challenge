@@ -2,8 +2,11 @@
 
 function buildMetaData(idd) {
   console.log("This is a function for Building panel table");
+  
   d3.json("/data/samples.json").then((data)=> {
+    console.log(data);
     var metadata = data.metadata;
+    console.log(metadata);
     //console.log(data.samples);
     //console.log(data.names);
     //console.log(data.metadata);
@@ -16,7 +19,7 @@ function buildMetaData(idd) {
     PANEL.html("");
 
     Object.entries(inputID).forEach(([key,value]) => {
-      PANEL.append("h3").text(`${key}: ${value}`);
+      PANEL.append("h5").text(`${key}: ${value}`);
     
   });
   // call build gauge
@@ -27,48 +30,63 @@ function buildMetaData(idd) {
 function buildPlots(x) {
   console.log("This is a function for Building Bar and bubble Plot for new ID");
 
-  d3.json("/data/samples.json").then(function(data) {
-    var xData = data.otu_ids.slice(0,10);
-    var yData = data.sample_values.slice(0,10);
-    var markerSize = data.sample_values;
-    var markerColor = data.otu_ids;
-    var textValues = data.otu_labels;
+  d3.json("/data/samples.json").then((data)=> {
+    
+    var samples = data.samples;
+    
+    var samplesArray = samples.filter(q=> q.id == x)
+    var result = samplesArray[0];
+
+
+
+    //var xData = result.otu_ids.slice(0,10);
+    //var yData = result.sample_values.slice(0,10);
+
+    //var markerSize = result.sample_values;
+    var sample_values = result.sample_values;
+
+    //var markerColor = result.otu_ids;
+    var otu_ids = result.otu_ids;
+
+    var textValues = result.otu_labels;
 
     //bar chart
     trace1 = {
-      x: xData,
-      y: yData,
-      type: "bar"
+      y: otu_ids.slice(0,10).reverse().map(otuID => `OTU ${otuID}`).reverse(),
+      x: sample_values.slice(0,10).reverse(),
+      type: "bar",
+      orientation: "h"
     };
 
-    var data = [trace1];
+    var barData = [trace1];
 
     var barlayout = {
-        title:"Bar",
-        xaxis: {title:"OTU IDs"},
-        yaxis: {title: "OTU Values"}
+        title:"Bar Chart, Top Ten OTUs ",
+        xaxis: {title:"OTU Values"},
+        yaxis: {title: "OTU IDs"},
+        margin: {t:30, l:150}
     };
 
-    Plotly.newPlot("bar", data, layout);
+    Plotly.newPlot("bar", barData, barlayout);
 
     //bubble chart
     trace2 = {
-      x: xData,
-      y: yData,
+      x: otu_ids,
+      y: sample_values,
       text: textValues,
       mode: "markers",
       marker: {
-        color: markerColor,
-        size: markerSize}
+        color: otu_ids,
+        size: sample_values}
     };
 
-    var bubbledata = [trace2];
+    var bubbleData = [trace2];
 
     var bubblelayout = {
       xaxis: {title: "OTU ID"}
     };
 
-    Plotly.newPlot("bubble", bubbledata, bubblelayout);
+    Plotly.newPlot("bubble", bubbleData, bubblelayout);
 
   });
 
@@ -76,41 +94,26 @@ function buildPlots(x) {
 
 //create init function to load default table
 function init() {
-  console.log("This is a function for Building Default Panel");
-
-
-    //var metadata = data.metadata;
-    //var defaultData = data.metadata[0];
-    //console.log(data.samples);
-    //console.log(data.names);
-    //console.log(data.metadata);
-    //console.log(data.metadata[0]);
-
-    //var inputValue = metadata.filter(x => x.id == idd);
-    //var inputID = inputValue[0];
-
-    //var PANEL = d3.select("#sample-metadata");
-    //PANEL.html("");
-    var selectNewSample = d3.select("#selNames");
-    
-    //selectNewSample.html("");
-
-    d3.json("/data/samples.json").then((xx)=> {
-      Object.entries(xx).forEach((sample) => {
-        selectNewSample.append("option").text(sample).property("value",sample);
-      });
-     
-    //var defaultId = "940"; //select the first sample from the list
-    var defaultData = xx[0];
-    buildMetaData(defaultData);
-    buildPlots(defaultData);
+  
+  var selectNewSample = d3.select("#selDataset");
+  
+  d3.json("/data/samples.json").then((data)=> {
+    var names = data.names;
+    console.log(names);
+    names.forEach((sample) => {
+      selectNewSample.append("option").text(sample).property("value",sample);
     });
+  
+  var defaultData = names[0];
+  buildMetaData(defaultData);
+  buildPlots(defaultData);
+  });
 
 };
 
 
 //creat function for getting data once a new sample id is selected
-function selectNewSample(newID) {
+function optionChanged(newID) {
   console.log("This is a function for Selecting New Sample");
 
   buildMetaData(newID);
@@ -119,5 +122,5 @@ function selectNewSample(newID) {
 
 
 ///Initializes the page with a default panel
-buildMetaData("941");
+//buildMetaData("941");
 init();
