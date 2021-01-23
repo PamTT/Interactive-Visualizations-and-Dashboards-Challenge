@@ -7,11 +7,7 @@ function buildMetaData(idd) {
     console.log(data);
     var metadata = data.metadata;
     console.log(metadata);
-    //console.log(data.samples);
-    //console.log(data.names);
-    //console.log(data.metadata);
-    console.log(data.metadata[0]);
-
+    
     var inputValue = metadata.filter(x => x.id == idd);
     var inputID = inputValue[0];
   
@@ -19,14 +15,11 @@ function buildMetaData(idd) {
     PANEL.html("");
 
     Object.entries(inputID).forEach(([key,value]) => {
-      PANEL.append("h6").text(`${key}: ${value}`);
+      PANEL.append("h5").text(`${key}: ${value}`);
     
   });
-  ///HERE
-  // call build gauge, buildGauge(data.WFREQ);
-  
-  ///HERE
-
+  // call build gauge
+  buildGauge(data.WFREQ);
 });
 }
 
@@ -37,11 +30,14 @@ function buildPlots(x) {
   d3.json("/data/samples.json").then((data)=> {
     
     var samples = data.samples;
+    
     var samplesArray = samples.filter(q=> q.id == x)
     var result = samplesArray[0];
-      console.log(result);
     var sample_values = result.sample_values;
-      console.log(sample_values);
+
+    var wfreq = result.wfreq;
+    console.log(wfreq);
+
     var otu_ids = result.otu_ids;
     var textValues = result.otu_labels;
 
@@ -63,7 +59,28 @@ function buildPlots(x) {
     };
 
     Plotly.newPlot("bar", barData, barlayout);
+
+    //gauge chart
+    var data = [
+      {
+        domain: { x: [0, 1], y: [0, 1] },
+        value: data.WFREQ,
+        title: { text: "WFreq" },
+        type: "indicator",
+        mode: "gauge+number",
+        delta: { reference: 8 },
+        gauge: { axis: { range: [null, 10] } }
+      }
+    ];
     
+    var layout = { width: 500, height: 400 };
+    Plotly.newPlot('gauge', data, layout);
+
+
+
+
+
+
     //bubble chart
     trace2 = {
       x: otu_ids,
