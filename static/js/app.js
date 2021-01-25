@@ -3,7 +3,7 @@
 function buildMetaData(idd) {
   console.log("This is a function for Building panel table");
   
-  d3.json("/data/samples.json").then((data)=> {
+  d3.json("./data/samples.json").then((data)=> {
     console.log(data);
     var metadata = data.metadata;
     console.log(metadata);
@@ -34,7 +34,7 @@ function buildMetaData(idd) {
 function buildPlots(x) {
   console.log("This is a function for Building Bar and bubble Plot for new ID");
 
-  d3.json("/data/samples.json").then((data)=> {
+  d3.json("./data/samples.json").then((data)=> {
     
     var samples = data.samples;
     var samplesArray = samples.filter(q=> q.id == x)
@@ -95,7 +95,7 @@ function init() {
   
   var selectNewSample = d3.select("#selDataset");
   
-  d3.json("/data/samples.json").then((data)=> {
+  d3.json("./data/samples.json").then((data)=> {
     var names = data.names;
     console.log(names);
     names.forEach((sample) => {
